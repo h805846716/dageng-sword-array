@@ -1,0 +1,10 @@
+{
+  "name": "大庚剑阵 · 手势御剑",
+  "short_name": "大庚剑阵",
+  "description": "用摄像头手势控制 3D 大庚剑阵。",
+  "start_url": "./",
+  "display": "fullscreen",
+  "background_color": "#050608",
+  "theme_color": "#050608",
+  "lang": "zh-CN"
+}

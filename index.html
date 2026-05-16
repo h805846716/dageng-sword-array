@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#050608" />
+  <meta name="description" content="用摄像头手势控制 3D 大庚剑阵，支持电脑和手机浏览器。" />
+  <meta property="og:title" content="大庚剑阵 · 手势御剑" />
+  <meta property="og:description" content="打开摄像头，用剑指、捏合、开掌、握拳和双手结印控制 3D 剑阵。" />
+  <meta property="og:type" content="website" />
+  <title>大庚剑阵 · 手势御剑</title>
+  <link rel="icon" href="data:," />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main id="app" aria-label="大庚剑阵"></main>
+
+  <div class="flash" id="flash" aria-hidden="true"></div>
+
+  <header class="hud" aria-label="剑阵控制台">
+    <div class="brand">
+      <h1>大庚剑阵</h1>
+      <p id="stateText">待机 · 12%</p>
+    </div>
+    <div class="energy" aria-hidden="true">
+      <span id="energyFill"></span>
+    </div>
+    <div class="toolbar">
+      <button id="cameraBtn" class="icon-button" type="button" title="摄像头手势" aria-label="摄像头手势">
+        <i data-lucide="camera"></i>
+      </button>
+      <button id="formationBtn" class="icon-button" type="button" title="切换阵型" aria-label="切换阵型">
+        <i data-lucide="orbit"></i>
+      </button>
+      <button id="burstBtn" class="icon-button" type="button" title="万剑齐发" aria-label="万剑齐发">
+        <i data-lucide="sparkles"></i>
+      </button>
+      <button id="resetBtn" class="icon-button" type="button" title="重置剑阵" aria-label="重置剑阵">
+        <i data-lucide="rotate-ccw"></i>
+      </button>
+    </div>
+  </header>
+
+  <section class="gesture-panel" id="gesturePanel" aria-label="手势状态">
+    <div class="gesture-current">
+      <span id="gestureName">指尖游走</span>
+      <strong id="formationName">剑轮</strong>
+    </div>
+    <div class="gesture-strip" aria-hidden="true">
+      <span data-gesture="sword">剑指</span>
+      <span data-gesture="point">引剑</span>
+      <span data-gesture="pinch">聚剑</span>
+      <span data-gesture="open">开阵</span>
+      <span data-gesture="fist">凝核</span>
+      <span data-gesture="horns">剑雨</span>
+      <span data-gesture="triad">结印</span>
+      <span data-gesture="double">双手</span>
+    </div>
+  </section>
+
+  <aside class="camera-view" id="cameraView" aria-hidden="true">
+    <video id="handVideo" playsinline muted autoplay></video>
+    <canvas id="handOverlay"></canvas>
+  </aside>
+
+  <script src="./vendor/mediapipe-hands/hands.js"></script>
+  <script src="./vendor/drawing_utils.js"></script>
+  <script src="./vendor/lucide.min.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
