@@ -336,13 +336,13 @@ button {
   }
 
   .camera-view {
-    width: min(300px, calc(100vw - 28px));
-    right: 50%;
-    bottom: calc(max(10px, env(safe-area-inset-bottom)) + 88px);
-    transform: translate(50%, 10px);
+    width: min(180px, 42vw);
+    right: max(10px, env(safe-area-inset-right));
+    bottom: calc(max(10px, env(safe-area-inset-bottom)) + 116px);
+    transform: translateY(10px);
   }
 
   .camera-view.is-on {
-    transform: translateX(50%);
+    transform: none;
   }
 }
