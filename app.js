@@ -107,6 +107,7 @@ const handControl = {
   looping: false,
   processing: false,
   seen: false,
+  modelReady: false,
   lastRaw: 'idle',
   stableGesture: 'idle',
   stableCount: 0,
@@ -115,6 +116,12 @@ const handControl = {
   hasPreviousWorld: false,
   velocity: new THREE.Vector3(),
   lastTime: performance.now(),
+  framesSent: 0,
+  resultsSeen: 0,
+  noHandFrames: 0,
+  lastFpsAt: performance.now(),
+  fps: 0,
+  status: '',
   lastFormationAt: 0,
   lastRainAt: 0,
   lastRingAt: 0,
@@ -591,14 +598,16 @@ function analyzeHand(landmarks) {
   };
   const palmWidth = Math.max(distance(landmarks[5], landmarks[17]), 0.001);
   const fingerDefs = {
-    index: [8, 6],
-    middle: [12, 10],
-    ring: [16, 14],
-    pinky: [20, 18]
+    index: [5, 6, 8],
+    middle: [9, 10, 12],
+    ring: [13, 14, 16],
+    pinky: [17, 18, 20]
   };
   const extended = {};
-  for (const [name, [tip, pip]] of Object.entries(fingerDefs)) {
-    extended[name] = distance(landmarks[tip], wrist) > distance(landmarks[pip], wrist) + palmWidth * 0.18;
+  for (const [name, [mcp, pip, tip]] of Object.entries(fingerDefs)) {
+    const wristReach = distance(landmarks[tip], wrist) > distance(landmarks[pip], wrist) + palmWidth * 0.06;
+    const palmReach = distance(landmarks[tip], palmCenter) > distance(landmarks[mcp], palmCenter) * 1.18;
+    extended[name] = wristReach || palmReach;
   }
   extended.thumb = distance(landmarks[4], palmCenter) > palmWidth * 0.72
     && distance(landmarks[4], landmarks[9]) > palmWidth * 0.72;
@@ -616,15 +625,15 @@ function classifyHand(profile, allProfiles) {
   if (allProfiles.length > 1) {
     const [a, b] = allProfiles;
     const bothOpen = a.count >= 4 && b.count >= 4;
-    const bothPinch = a.pinch < 0.58 && b.pinch < 0.58;
+    const bothPinch = a.pinch < 0.72 && b.pinch < 0.72;
     const centerGap = Math.hypot(a.center.x - b.center.x, a.center.y - b.center.y);
     if ((bothOpen && centerGap < 0.34) || bothPinch) return 'seal';
     if (bothOpen || (a.count >= 3 && b.count >= 3)) return 'double';
   }
 
   const f = profile.extended;
-  if (profile.pinch < 0.56) return 'pinch';
-  if (profile.count >= 4) return 'open';
+  if (profile.pinch < 0.72) return 'pinch';
+  if (profile.count >= 3 && profile.pinch > 0.95) return 'open';
   if (f.index && f.middle && !f.ring && !f.pinky) return 'sword';
   if (f.index && !f.middle && !f.ring && !f.pinky) return 'point';
   if (!f.index && !f.middle && !f.ring && !f.pinky) return 'fist';
@@ -768,8 +777,11 @@ function drawHandOverlay(profiles, activeGesture) {
 }
 
 function handleHandResults(results) {
+  handControl.resultsSeen += 1;
   const rawHands = results.multiHandLandmarks || [];
   if (!rawHands.length) {
+    handControl.noHandFrames += 1;
+    handControl.status = handControl.framesSent > 0 ? `识别中 ${handControl.fps}fps · 把手放进小窗` : '等待视频帧';
     handCtx.clearRect(0, 0, handOverlay.width, handOverlay.height);
     if (handControl.previousGesture === 'pinch') releaseVolley(false);
     handControl.seen = false;
@@ -785,6 +797,7 @@ function handleHandResults(results) {
   const profiles = rawHands.slice(0, 2).map(analyzeHand).sort((a, b) => b.size - a.size);
   const raw = classifyHand(profiles[0], profiles);
   const stable = setStableGesture(raw);
+  handControl.status = `已捕捉 ${profiles.length} 手 · ${handControl.fps}fps`;
   handControl.seen = true;
   drawHandOverlay(profiles, stable);
   applyGesture(stable, profiles[0], profiles);
@@ -798,8 +811,16 @@ async function handLoop() {
       handControl.processing = true;
       try {
         await handControl.hands.send({ image: handVideo });
+        handControl.framesSent += 1;
+        const now = performance.now();
+        if (now - handControl.lastFpsAt > 1000) {
+          handControl.fps = Math.round(handControl.framesSent * 1000 / (now - handControl.lastFpsAt));
+          handControl.framesSent = 0;
+          handControl.lastFpsAt = now;
+        }
       } catch (err) {
         console.error(err);
+        handControl.status = friendlyHandError(err);
         gestureName.textContent = friendlyHandError(err);
       }
       handControl.processing = false;
@@ -812,6 +833,8 @@ async function handLoop() {
 async function startHandControl() {
   cameraBtn.disabled = true;
   gestureName.textContent = '启动摄像头';
+  handControl.enabled = true;
+  handControl.status = '请求摄像头权限';
   try {
     if (!HandTracker || !drawLandmarks) throw new Error('手势识别脚本没加载成功');
     if (!navigator.mediaDevices?.getUserMedia) throw new Error('当前浏览器不支持摄像头');
@@ -821,12 +844,14 @@ async function startHandControl() {
       });
       handControl.hands.setOptions({
         maxNumHands: 2,
-        modelComplexity: 1,
-        minDetectionConfidence: 0.72,
-        minTrackingConfidence: 0.68
+        modelComplexity: 0,
+        minDetectionConfidence: 0.58,
+        minTrackingConfidence: 0.52
       });
       handControl.hands.onResults(handleHandResults);
     }
+    cameraView.classList.add('is-on');
+    handControl.status = '请求摄像头权限';
     handControl.stream = await navigator.mediaDevices.getUserMedia({
       audio: false,
       video: {
@@ -836,18 +861,38 @@ async function startHandControl() {
       }
     });
     handVideo.srcObject = handControl.stream;
+    await new Promise(resolve => {
+      if (handVideo.readyState >= 1) resolve();
+      else handVideo.onloadedmetadata = () => resolve();
+    });
+    handControl.status = '摄像头已打开，加载手势模型';
     await handVideo.play();
-    handControl.enabled = true;
+    if (!handControl.modelReady) {
+      await handControl.hands.initialize();
+      handControl.modelReady = true;
+    }
+    handControl.status = '正在识别，把手放进小窗';
     handControl.seen = false;
+    handControl.framesSent = 0;
+    handControl.resultsSeen = 0;
+    handControl.noHandFrames = 0;
+    handControl.fps = 0;
+    handControl.lastFpsAt = performance.now();
     handControl.hasPreviousWorld = false;
     handControl.previousGesture = 'idle';
     handControl.stableGesture = 'idle';
     handControl.stableCount = 0;
-    cameraView.classList.add('is-on');
     cameraBtn.classList.add('is-on');
     handLoop();
   } catch (err) {
     console.error(err);
+    handControl.enabled = false;
+    handControl.stream?.getTracks().forEach(track => track.stop());
+    handControl.stream = null;
+    handVideo.srcObject = null;
+    cameraView.classList.remove('is-on');
+    cameraBtn.classList.remove('is-on');
+    handControl.status = friendlyHandError(err);
     gestureName.textContent = friendlyHandError(err);
   } finally {
     cameraBtn.disabled = false;
@@ -858,6 +903,7 @@ function stopHandControl() {
   if (handControl.previousGesture === 'pinch') releaseVolley(false);
   handControl.enabled = false;
   handControl.seen = false;
+  handControl.status = '';
   handControl.hasPreviousWorld = false;
   handControl.previousGesture = 'idle';
   handControl.stream?.getTracks().forEach(track => track.stop());
@@ -1042,10 +1088,21 @@ function updateBursts(dt) {
 
 function updateHud() {
   const pct = Math.round(sim.energy * 100);
+  if (!handControl.enabled && handControl.status) {
+    energyFill.style.width = `${pct}%`;
+    stateText.textContent = handControl.status;
+    gestureName.textContent = handControl.status;
+    formationName.textContent = sim.volley ? '归宗' : formations[sim.formation];
+    document.querySelectorAll('.gesture-strip span').forEach(item => item.classList.remove('is-active'));
+    return;
+  }
   const gesture = handControl.enabled && !handControl.seen ? 'lost' : sim.gesture;
-  const label = gestureLabels[gesture] || gestureLabels.idle;
+  const baseLabel = gestureLabels[gesture] || gestureLabels.idle;
+  const label = handControl.enabled && handControl.seen && gesture === 'idle' ? '已捕捉手掌' : baseLabel;
   energyFill.style.width = `${pct}%`;
-  stateText.textContent = `${label} · ${pct}%`;
+  stateText.textContent = handControl.enabled && handControl.status
+    ? `${label} · ${handControl.status}`
+    : `${label} · ${pct}%`;
   gestureName.textContent = label;
   formationName.textContent = sim.volley ? '归宗' : formations[sim.formation];
   document.querySelectorAll('.gesture-strip span').forEach(item => {
