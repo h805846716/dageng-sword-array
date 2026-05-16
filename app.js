@@ -840,14 +840,13 @@ async function startHandControl() {
     if (!navigator.mediaDevices?.getUserMedia) throw new Error('当前浏览器不支持摄像头');
     if (!handControl.hands) {
       handControl.hands = new HandTracker({
-        locateFile: file => new URL(`./vendor/mediapipe-hands/${file}`, location.href).href
+        locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${file}`
       });
       handControl.hands.setOptions({
-        maxNumHands: 2,
-        selfieMode: true,
+        maxNumHands: 1,
         modelComplexity: 1,
-        minDetectionConfidence: 0.5,
-        minTrackingConfidence: 0.5
+        minDetectionConfidence: 0.7,
+        minTrackingConfidence: 0.68
       });
       handControl.hands.onResults(handleHandResults);
     }
