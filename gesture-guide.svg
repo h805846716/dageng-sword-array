@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="840" viewBox="0 0 1200 840">
+  <defs>
+    <style>
+      .bg { fill: #050608; }
+      .card { fill: #0b0f10; stroke: rgba(244,248,247,.18); stroke-width: 2; }
+      .title { fill: #f4f8f7; font: 700 30px system-ui, "PingFang SC", sans-serif; }
+      .label { fill: #f7d36b; font: 700 25px system-ui, "PingFang SC", sans-serif; }
+      .note { fill: rgba(244,248,247,.66); font: 18px system-ui, "PingFang SC", sans-serif; }
+      .bone { stroke: #62f2d5; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      .soft { stroke: rgba(244,248,247,.28); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      .tip { fill: #f7d36b; stroke: #050608; stroke-width: 2; }
+      .palm { fill: rgba(98,242,213,.08); stroke: rgba(98,242,213,.72); stroke-width: 4; }
+      .arrow { stroke: #84b7ff; stroke-width: 6; stroke-linecap: round; marker-end: url(#arrowHead); fill: none; }
+      .pinch { stroke: #ff7657; stroke-width: 6; stroke-linecap: round; fill: none; stroke-dasharray: 10 9; }
+    </style>
+    <marker id="arrowHead" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#84b7ff"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="1200" height="840"/>
+  <text class="title" x="44" y="58">大庚剑阵 · 单手手势示意</text>
+  <text class="note" x="44" y="91">把整只手放进摄像头小窗，优先让手掌正对镜头。识别稳定后再做动作。</text>
+
+  <g transform="translate(35 125)">
+    <rect class="card" width="260" height="205" rx="18"/>
+    <text class="label" x="26" y="40">剑指</text>
+    <text class="note" x="26" y="68">食指 + 中指伸出</text>
+    <path class="palm" d="M110 154 L82 118 L94 82 L126 74 L158 91 L169 126 L144 157 Z"/>
+    <path class="bone" d="M122 152 L122 61"/>
+    <path class="bone" d="M146 146 L150 58"/>
+    <path class="soft" d="M104 138 C93 122 86 111 83 96"/>
+    <path class="soft" d="M166 132 C180 116 183 101 177 89"/>
+    <path class="soft" d="M89 132 C66 132 55 124 49 110"/>
+    <circle class="tip" cx="122" cy="61" r="7"/><circle class="tip" cx="150" cy="58" r="7"/>
+  </g>
+
+  <g transform="translate(325 125)">
+    <rect class="card" width="260" height="205" rx="18"/>
+    <text class="label" x="26" y="40">引剑</text>
+    <text class="note" x="26" y="68">只伸食指，移动引导</text>
+    <path class="palm" d="M112 154 L84 120 L97 88 L132 80 L161 103 L165 135 L143 158 Z"/>
+    <path class="bone" d="M123 151 L123 56"/>
+    <path class="soft" d="M147 144 C156 124 155 105 144 91"/>
+    <path class="soft" d="M167 132 C184 116 185 100 176 88"/>
+    <path class="soft" d="M101 139 C87 125 82 109 87 94"/>
+    <path class="soft" d="M87 132 C63 130 52 121 48 106"/>
+    <path class="arrow" d="M178 80 C206 84 219 104 224 132"/>
+    <circle class="tip" cx="123" cy="56" r="7"/>
+  </g>
+
+  <g transform="translate(615 125)">
+    <rect class="card" width="260" height="205" rx="18"/>
+    <text class="label" x="26" y="40">聚剑</text>
+    <text class="note" x="26" y="68">拇指和食指捏合</text>
+    <path class="palm" d="M112 158 L84 124 L94 91 L128 80 L160 101 L166 135 L144 160 Z"/>
+    <path class="bone" d="M124 151 C128 122 134 102 142 83"/>
+    <path class="bone" d="M89 134 C108 128 125 111 142 83"/>
+    <path class="soft" d="M150 144 C160 126 159 107 147 93"/>
+    <path class="soft" d="M170 132 C187 116 187 100 178 89"/>
+    <path class="soft" d="M104 140 C92 124 88 111 91 97"/>
+    <path class="pinch" d="M137 78 C119 74 99 87 89 110"/>
+    <circle class="tip" cx="142" cy="83" r="7"/><circle class="tip" cx="89" cy="134" r="7"/>
+  </g>
+
+  <g transform="translate(905 125)">
+    <rect class="card" width="260" height="205" rx="18"/>
+    <text class="label" x="26" y="40">开阵</text>
+    <text class="note" x="26" y="68">张开手掌</text>
+    <path class="palm" d="M118 161 L86 122 L96 88 L128 75 L162 88 L178 122 L150 161 Z"/>
+    <path class="bone" d="M121 154 L111 61"/>
+    <path class="bone" d="M140 151 L145 49"/>
+    <path class="bone" d="M158 143 L183 66"/>
+    <path class="bone" d="M99 145 L73 76"/>
+    <path class="bone" d="M90 133 L45 126"/>
+    <circle class="tip" cx="111" cy="61" r="7"/><circle class="tip" cx="145" cy="49" r="7"/>
+    <circle class="tip" cx="183" cy="66" r="7"/><circle class="tip" cx="73" cy="76" r="7"/><circle class="tip" cx="45" cy="126" r="7"/>
+  </g>
+
+  <g transform="translate(35 380)">
+    <rect class="card" width="260" height="205" rx="18"/>
+    <text class="label" x="26" y="40">凝核</text>
+    <text class="note" x="26" y="68">握拳收拢</text>
+    <path class="palm" d="M92 152 C72 129 76 91 103 75 C130 59 169 72 181 103 C195 139 164 171 128 168 C113 167 101 162 92 152 Z"/>
+    <path class="bone" d="M100 118 C112 96 131 91 151 101"/>
+    <path class="bone" d="M96 136 C117 122 141 122 164 137"/>
+    <path class="soft" d="M88 105 C75 101 65 95 58 84"/>
+    <circle class="tip" cx="151" cy="101" r="7"/><circle class="tip" cx="164" cy="137" r="7"/>
+  </g>
+
+  <g transform="translate(325 380)">
+    <rect class="card" width="260" height="205" rx="18"/>
+    <text class="label" x="26" y="40">剑雨</text>
+    <text class="note" x="26" y="68">食指 + 小指伸出</text>
+    <path class="palm" d="M116 158 L86 123 L98 91 L132 80 L164 101 L169 136 L146 160 Z"/>
+    <path class="bone" d="M123 151 L116 56"/>
+    <path class="bone" d="M165 135 L197 73"/>
+    <path class="soft" d="M145 144 C151 123 148 105 136 92"/>
+    <path class="soft" d="M157 142 C169 128 173 113 167 100"/>
+    <path class="soft" d="M92 134 C68 132 55 122 49 108"/>
+    <circle class="tip" cx="116" cy="56" r="7"/><circle class="tip" cx="197" cy="73" r="7"/>
+  </g>
+
+  <g transform="translate(615 380)">
+    <rect class="card" width="260" height="205" rx="18"/>
+    <text class="label" x="26" y="40">结印</text>
+    <text class="note" x="26" y="68">食指 + 中指 + 无名指</text>
+    <path class="palm" d="M116 158 L86 122 L96 90 L130 78 L164 96 L171 132 L148 160 Z"/>
+    <path class="bone" d="M119 152 L112 58"/>
+    <path class="bone" d="M139 151 L143 51"/>
+    <path class="bone" d="M157 144 L174 66"/>
+    <path class="soft" d="M177 130 C190 114 190 101 181 90"/>
+    <path class="soft" d="M91 134 C68 132 56 122 50 108"/>
+    <circle class="tip" cx="112" cy="58" r="7"/><circle class="tip" cx="143" cy="51" r="7"/><circle class="tip" cx="174" cy="66" r="7"/>
+  </g>
+
+  <g transform="translate(905 380)">
+    <rect class="card" width="260" height="205" rx="18"/>
+    <text class="label" x="26" y="40">换阵</text>
+    <text class="note" x="26" y="68">拇指伸出，少量辅助</text>
+    <path class="palm" d="M128 163 L95 132 L100 94 L132 78 L164 94 L173 130 L151 160 Z"/>
+    <path class="bone" d="M97 131 L45 97"/>
+    <path class="soft" d="M122 151 C116 126 119 105 132 87"/>
+    <path class="soft" d="M144 148 C153 126 153 107 142 92"/>
+    <path class="soft" d="M163 135 C178 118 180 103 171 91"/>
+    <circle class="tip" cx="45" cy="97" r="7"/>
+  </g>
+
+  <text class="note" x="44" y="660">提示：聚剑是“捏住蓄力，松开释放”；引剑是“伸食指移动”；开阵最容易触发，适合先测试识别。</text>
+</svg>

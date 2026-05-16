@@ -336,9 +336,9 @@ button {
   }
 
   .camera-view {
-    width: min(180px, 42vw);
+    width: min(118px, 30vw);
     right: max(10px, env(safe-area-inset-right));
-    bottom: calc(max(10px, env(safe-area-inset-bottom)) + 116px);
+    bottom: calc(max(10px, env(safe-area-inset-bottom)) + 110px);
     transform: translateY(10px);
   }
 

@@ -67,8 +67,6 @@ const gestureLabels = {
   horns: '剑雨落阵',
   triad: '三指结印',
   thumb: '换阵',
-  double: '双手合阵',
-  seal: '合掌归一',
   lost: '寻手'
 };
 const gestureToStrip = {
@@ -79,9 +77,7 @@ const gestureToStrip = {
   fist: 'fist',
   horns: 'horns',
   triad: 'triad',
-  thumb: 'sword',
-  double: 'double',
-  seal: 'double'
+  thumb: 'thumb'
 };
 
 const sim = {
@@ -96,7 +92,6 @@ const sim = {
   compression: 0,
   shield: 0,
   rain: 0,
-  twoHand: 0,
   pointerDown: false
 };
 
@@ -547,7 +542,7 @@ function rainInto(out, sword, index, time) {
   ).addScaledVector(targetWorld, 0.18);
 }
 
-function sealInto(out, sword, index, time) {
+function triadInto(out, sword, index, time) {
   const layer = index % 6;
   const angle = sword.phase + time * (0.85 + layer * 0.08);
   const radius = 1.3 + layer * 0.54 + Math.sin(time * 1.1 + sword.seed) * 0.08;
@@ -576,7 +571,7 @@ function desiredInto(out, sword, index, time) {
   if (sim.command === 'point') return streamInto(out, sword, index, time);
   if (sim.command === 'sword') return swordFingerInto(out, sword, index, time);
   if (sim.command === 'horns') return rainInto(out, sword, index, time);
-  if (sim.command === 'triad' || sim.command === 'double' || sim.command === 'seal') return sealInto(out, sword, index, time);
+  if (sim.command === 'triad') return triadInto(out, sword, index, time);
   return formationInto(out, index, time, sword.seed, targetWorld);
 }
 
@@ -622,15 +617,6 @@ function analyzeHand(landmarks) {
 }
 
 function classifyHand(profile, allProfiles) {
-  if (allProfiles.length > 1) {
-    const [a, b] = allProfiles;
-    const bothOpen = a.count >= 4 && b.count >= 4;
-    const bothPinch = a.pinch < 0.72 && b.pinch < 0.72;
-    const centerGap = Math.hypot(a.center.x - b.center.x, a.center.y - b.center.y);
-    if ((bothOpen && centerGap < 0.34) || bothPinch) return 'seal';
-    if (bothOpen || (a.count >= 3 && b.count >= 3)) return 'double';
-  }
-
   const f = profile.extended;
   if (profile.pinch < 0.72) return 'pinch';
   if (profile.count >= 3 && profile.pinch > 0.95) return 'open';
@@ -726,23 +712,6 @@ function applyGesture(gesture, profile, profiles) {
     if (now - handControl.lastRingAt > 620) {
       addRing(targetWorld.clone(), 0xf7d36b, -0.35);
       handControl.lastRingAt = now;
-    }
-  } else if (gesture === 'double') {
-    setCommand('double');
-    sim.twoHand = 1;
-    sim.shield = 1;
-    sim.energy = THREE.MathUtils.clamp(sim.energy + 0.009, 0.12, 1);
-    if (now - handControl.lastRingAt > 520) {
-      addRing(targetWorld.clone(), 0x98f07a, 0.25);
-      handControl.lastRingAt = now;
-    }
-  } else if (gesture === 'seal') {
-    setCommand('seal');
-    sim.twoHand = 1;
-    sim.energy = THREE.MathUtils.clamp(sim.energy + 0.016, 0.16, 1);
-    if (now - handControl.lastSealAt > 1400) {
-      releaseVolley(true);
-      handControl.lastSealAt = now;
     }
   } else if (gesture === 'thumb') {
     setCommand('idle');
@@ -924,7 +893,6 @@ function reset() {
   sim.compression = 0;
   sim.shield = 0;
   sim.rain = 0;
-  sim.twoHand = 0;
   targetWorld.set(0, 0, 0);
   previousTarget.set(0, 0, 0);
   renderer.domElement.classList.remove('is-commanding');
@@ -991,9 +959,9 @@ addEventListener('resize', () => {
 
 function updateSwords(dt, time) {
   sim.commandAge += dt;
-  if (sim.command === 'pinch' || sim.command === 'fist' || sim.command === 'seal') {
+  if (sim.command === 'pinch' || sim.command === 'fist') {
     sim.energy = THREE.MathUtils.clamp(sim.energy + dt * 0.24, 0.12, 1);
-  } else if (sim.command === 'sword' || sim.command === 'triad' || sim.command === 'double' || sim.command === 'horns') {
+  } else if (sim.command === 'sword' || sim.command === 'triad' || sim.command === 'horns') {
     sim.energy = THREE.MathUtils.clamp(sim.energy + dt * 0.08, 0.12, 1);
   } else if (sim.volley) {
     sim.volleyAge += dt;
@@ -1007,7 +975,6 @@ function updateSwords(dt, time) {
   sim.compression = Math.max(0, sim.compression - dt * 1.4);
   sim.shield = Math.max(0, sim.shield - dt * 0.9);
   sim.rain = Math.max(0, sim.rain - dt * 1.05);
-  sim.twoHand = Math.max(0, sim.twoHand - dt * 0.9);
 
   for (let i = 0; i < SWORD_COUNT; i++) {
     const sword = swords[i];
