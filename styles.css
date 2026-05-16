@@ -259,7 +259,7 @@ button {
 }
 
 .camera-view.is-on {
-  opacity: .92;
+  opacity: 1;
   transform: none;
 }
 
@@ -336,8 +336,13 @@ button {
   }
 
   .camera-view {
-    width: 126px;
-    right: max(10px, env(safe-area-inset-right));
+    width: min(300px, calc(100vw - 28px));
+    right: 50%;
     bottom: calc(max(10px, env(safe-area-inset-bottom)) + 88px);
+    transform: translate(50%, 10px);
+  }
+
+  .camera-view.is-on {
+    transform: translateX(50%);
   }
 }

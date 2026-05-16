@@ -840,13 +840,14 @@ async function startHandControl() {
     if (!navigator.mediaDevices?.getUserMedia) throw new Error('当前浏览器不支持摄像头');
     if (!handControl.hands) {
       handControl.hands = new HandTracker({
-        locateFile: file => `./vendor/mediapipe-hands/${file}`
+        locateFile: file => new URL(`./vendor/mediapipe-hands/${file}`, location.href).href
       });
       handControl.hands.setOptions({
         maxNumHands: 2,
-        modelComplexity: 0,
-        minDetectionConfidence: 0.58,
-        minTrackingConfidence: 0.52
+        selfieMode: true,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5
       });
       handControl.hands.onResults(handleHandResults);
     }
@@ -865,12 +866,8 @@ async function startHandControl() {
       if (handVideo.readyState >= 1) resolve();
       else handVideo.onloadedmetadata = () => resolve();
     });
-    handControl.status = '摄像头已打开，加载手势模型';
+    handControl.status = '摄像头已打开，正在识别';
     await handVideo.play();
-    if (!handControl.modelReady) {
-      await handControl.hands.initialize();
-      handControl.modelReady = true;
-    }
     handControl.status = '正在识别，把手放进小窗';
     handControl.seen = false;
     handControl.framesSent = 0;
